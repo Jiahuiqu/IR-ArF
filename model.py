@@ -3,7 +3,6 @@ import torch.nn as nn
 import numpy as np
 import scipy.stats as st
 from matplotlib import pyplot as plt
-# import torchfields
 from scipy.io import savemat
 
 device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
@@ -29,9 +28,7 @@ def to_pixel_samples(img):
     """ Convert the image to coord-RGB pairs.
         img: Tensor, (3, H, W)
     """
-    # 对应坐标与第几个，
     coord = make_coord(img.shape[-2:])
-    # img打平， 形状为 [B, HxW， C]
     rgb = img.view(img.size(0), img.size(1), -1).permute(0, 2, 1)
     return coord, rgb
 
