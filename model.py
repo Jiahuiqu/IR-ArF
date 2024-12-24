@@ -53,17 +53,15 @@ class MLP(nn.Module):
         x = self.layers(x.view(-1, x.shape[-1]))
         return x.view(*shape, -1)
 
-def get_kernel(kernlen=5, nsig=3):     # nsig 标准差 ，kernlen=16核尺寸
+def get_kernel(kernlen=5, nsig=3):     
     nsig = nsig.detach().numpy()
-    interval = (2*nsig+1.)/kernlen      #计算间隔
-    x = np.linspace(-nsig-interval/2., nsig+interval/2., kernlen+1)   #在前两者之间均匀产生数据
+    interval = (2*nsig+1.)/kernlen     
+    x = np.linspace(-nsig-interval/2., nsig+interval/2., kernlen+1)  
 
-                                          #高斯函数其实就是正态分布的密度函数
-    kern1d = np.diff(st.norm.cdf(x))      #先积分在求导是为啥？得到一个维度上的高斯函数值
-    '''st.norm.cdf(x):计算正态分布累计分布函数指定点的函数值
-        累计分布函数：概率分布函数的积分'''
-    kernel_raw = np.sqrt(np.outer(kern1d, kern1d))   #np.outer计算外积，再开平方，从1维高斯参数到2维高斯参数
-    kernel = kernel_raw/kernel_raw.sum()             #确保均值为1
+                                         
+    kern1d = np.diff(st.norm.cdf(x))      
+    kernel_raw = np.sqrt(np.outer(kern1d, kern1d))  
+    kernel = kernel_raw/kernel_raw.sum()           
     return kernel
 
 
@@ -82,7 +80,6 @@ class R_PSF_down(nn.Module):
 class Register(nn.Module):
     def __init__(self, hs_channels, patch_size):
         super(Register, self).__init__()
-        # 注意力层
         self.q_linear = nn.Linear(1 * patch_size * patch_size,
                                   hs_channels * patch_size * patch_size)
         self.k_linear = nn.Linear(hs_channels * patch_size * patch_size,
@@ -92,7 +89,6 @@ class Register(nn.Module):
         self.patchsize = patch_size
 
     def forward(self, hs, ms):  # input tensor size is [batch_size, seq_length, input_dim]
-        """填充，让hs能被patch整切"""
         b, c, h_o, w_o = hs.shape
         pad_h = (4 - (h_o % 4)) % 4
         if pad_h:
@@ -101,11 +97,10 @@ class Register(nn.Module):
         'spilt cube to patch'
         hs_copy = hs.view(b, c, h // self.patchsize, self.patchsize, w // self.patchsize, self.patchsize)
         hs_copy = hs_copy.permute(0, 1, 2, 4, 3, 5)
-        hs_copy = hs_copy.contiguous().view(b, c, -1, self.patchsize, self.patchsize)  # 使用.contiguous()来确保张量在内存中是连续的
+        hs_copy = hs_copy.contiguous().view(b, c, -1, self.patchsize, self.patchsize) 
         hs_copy = hs_copy.permute(0, 2, 1, 3, 4)
         hs_copy = hs_copy.flatten(2)
 
-        """插值，输入hs做参考的时，取4个波段"""
         ms = torch.mean(ms, dim=1).unsqueeze(1)
         ms = torch.nn.functional.interpolate(ms, size=[h_o, w_o], mode='bicubic', align_corners=False)
         if pad_h:
@@ -114,7 +109,7 @@ class Register(nn.Module):
 
         ms_copy = ms.view(b, c_m, h // self.patchsize, self.patchsize, w // self.patchsize, self.patchsize)
         ms_copy = ms_copy.permute(0, 1, 2, 4, 3, 5)
-        ms_copy = ms_copy.contiguous().view(b, c_m, -1, self.patchsize, self.patchsize)  # 使用.contiguous()来确保张量在内存中是连续的
+        ms_copy = ms_copy.contiguous().view(b, c_m, -1, self.patchsize, self.patchsize) 
         ms_copy = ms_copy.permute(0, 2, 1, 3, 4)
         ms_copy = ms_copy.flatten(2)
 
@@ -147,17 +142,13 @@ class B_T_Block(nn.Module):
         )
     def query(self, feat, coord, cell=None):
 
-        # unflod成 [B,3*3,C,H,W]
         feat = torch.nn.functional.unfold(feat, 3, padding=1).view(
             feat.shape[0], feat.shape[1] * 9, feat.shape[2], feat.shape[3])
-        # feat = torch.nn.functional.unfold(feat, 1, padding=0).view(
-        #     feat.shape[0], feat.shape[1] * 1, feat.shape[2], feat.shape[3])
 
         vx_lst = [-1, 1]
         vy_lst = [-1, 1]
         eps_shift = 1e-6
 
-        # field radius (global: [-1, 1])
         rx = 2 / feat.shape[-2] / 2
         ry = 2 / feat.shape[-1] / 2
 
@@ -228,8 +219,6 @@ class B_M(nn.Module):
         self.mlp = MLP(40, in_c, [256, 256, 256, 256])
 
     def forward(self, feat, coord, cell=None):
-
-        # unflod成 [B,3*3,C,H,W]
         feat = torch.nn.functional.unfold(feat, 3, padding=1).view(
             feat.shape[0], feat.shape[1] * 9, feat.shape[2], feat.shape[3])
 
@@ -323,7 +312,6 @@ class B_M_UP(nn.Module):
 
     def forward(self, feat, coord, cell=None):
 
-        # unflod成 [B,3*3,C,H,W]
         feat = torch.nn.functional.unfold(feat, 3, padding=1).view(
             feat.shape[0], feat.shape[1] * 9, feat.shape[2], feat.shape[3])
 
@@ -581,7 +569,6 @@ class UnetSpatial(torch.nn.Module):
 
     def forward(self, x):
         sz = x.shape
-        # x = x.view(-1,1,sz[2],sz[3])
         x = self.fe_conv1(x)
 
         encode0, down0 = self.Encoding_block1(x)
@@ -622,7 +609,7 @@ class FandD(nn.Module):
 
 
 """
-    主框架
+    Main
 """
 class Main(nn.Module):
     def __init__(self, bands, args):
