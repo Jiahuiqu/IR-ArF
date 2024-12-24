@@ -257,9 +257,9 @@ def train(train_loader, model, loss_l1, loss_NCC, optimizer, epoch, args, tf_wri
         batch_size = pan.shape[0]
 
         HRHS, B_Xp1, B_Xp2, B_Xp3, E_HS1, E_HS2, E_HS3 = model(pan, lrhs, h)
-        """LOSS区域"""
+        """LOSS"""
         loss1 = loss_l1(HRHS, gths_loss)
-        #　配准ｌｏｓｓ
+        #　loss for registration
         loss2_1 = loss_NCC.loss(torch.mean(lrhs, dim=1).unsqueeze(1), torch.mean(B_Xp1, dim=1).unsqueeze(1))
         loss2_2 = loss_NCC.loss(torch.mean(lrhs, dim=1).unsqueeze(1), torch.mean(B_Xp2, dim=1).unsqueeze(1))
         loss2_3 = loss_NCC.loss(torch.mean(lrhs, dim=1).unsqueeze(1), torch.mean(B_Xp3, dim=1).unsqueeze(1))
