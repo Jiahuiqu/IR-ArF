@@ -1,0 +1,16 @@
+fusepy==3.0.1
+matplotlib==3.7.1
+numpy==2.2.1
+openpyxl==3.1.5
+pandas==1.5.2
+predict==3.1.17
+scikit_learn==1.2.0
+scipy==1.14.1
+skimage==0.0
+tensorboardX==2.6.2.2
+tensorboardX==2.6.2.2
+thop==0.1.1.post2209072238
+torch==2.4.0
+torchfields==0.1.2
+torchsummary==1.5.1
+torchvision==0.19.0
