@@ -10,7 +10,6 @@ device = t.device('cuda:1' if t.cuda.is_available() else 'cpu')
 
 
 
-# 读取数据集图片
 class MyDataset(Dataset):
     def __init__(self, root, mode, alpha):
         super(MyDataset, self).__init__()
@@ -26,7 +25,6 @@ class MyDataset(Dataset):
             transforms.RandomRotation(180),
         ])
         if mode == 'test' and self.root.split('/')[-1] != 'XJ':
-            # 建立索引 + 对索引排序
             self.lrHSroot = os.listdir(os.path.join(root, "test", "LRHS"+ alpha))
             self.lrHSroot.sort(key=lambda x: int(x.split(".")[0]))
             self.PANroot = os.listdir(os.path.join(root, "test", "hrMS"))
@@ -34,7 +32,6 @@ class MyDataset(Dataset):
             self.gtHSroot = os.listdir(os.path.join(root, "test", "gtHS"))
             self.gtHSroot.sort(key=lambda x: int(x.split(".")[0]))
         elif mode == 'test':
-            # 建立索引 + 对索引排序
             self.lrHSroot = os.listdir(os.path.join(root, "test", "LRHS" + alpha))
             self.lrHSroot.sort(key=lambda x: int(x.split(".")[0]))
             self.PANroot = os.listdir(os.path.join(root, "test", "hrMS"))
