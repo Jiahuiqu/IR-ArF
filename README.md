@@ -54,14 +54,14 @@ python test.py
         If you find our work helpful in your research, please consider citing our paper
         ```
         @ARTICLE{10938029,
-  author={Qu, Jiahui and Wu, Xiaoyang and Dong, Wenqian and Cui, Jizhou and Li, Yunsong},
-  journal={IEEE Transactions on Image Processing}, 
-  title={IR&ArF: Toward Deep Interpretable Arbitrary Resolution Fusion of Unregistered Hyperspectral and Multispectral Images}, 
-  year={2025},
-  volume={34},
-  number={},
-  pages={1934-1949},
-  doi={10.1109/TIP.2025.3551531}}
+          author={Qu, Jiahui and Wu, Xiaoyang and Dong, Wenqian and Cui, Jizhou and Li, Yunsong},
+          journal={IEEE Transactions on Image Processing}, 
+          title={IR&ArF: Toward Deep Interpretable Arbitrary Resolution Fusion of Unregistered Hyperspectral and Multispectral Images}, 
+          year={2025},
+          volume={34},
+          number={},
+          pages={1934-1949},
+          doi={10.1109/TIP.2025.3551531}}
         ```
         
 
